@@ -2,108 +2,166 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>Prompt Arsenal Pro | 全行业AI提示词军火库</title>
+    <title>Prompt Arsenal Pro | 终极AI提示词军火库</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { background: #08080a; color: #d1d5db; font-family: 'Inter', system-ui; }
-        .glass { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); backdrop-filter: blur(10px); }
-        .neon-border { border-color: #10b981; box-shadow: 0 0 15px rgba(16, 185, 129, 0.2); }
-        .industry-card:hover { border-color: #3b82f6; background: rgba(59, 130, 246, 0.05); }
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&family=Noto+Sans+SC:wght@300;500;900&display=swap');
+        body { background: #08080a; color: #d1d5db; font-family: 'Space Grotesk', 'Noto Sans SC', sans-serif; }
+        .glass { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); backdrop-filter: blur(12px); }
+        .neon-border { border-color: #10b981; box-shadow: 0 0 20px rgba(16, 185, 129, 0.15); }
+        .gradient-text { background: linear-gradient(90deg, #10b981, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .industry-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .industry-card:hover { transform: translateY(-2px); background: rgba(255, 255, 255, 0.05); }
     </style>
 </head>
-<body class="p-4 md:p-8">
+<body class="p-4 md:p-8 min-h-screen">
 
     <div class="max-w-7xl mx-auto">
-        <header class="flex flex-col md:flex-row justify-between items-center mb-10">
+        <header class="flex flex-col md:flex-row justify-between items-center mb-10 gap-6">
             <div>
-                <h1 class="text-3xl font-black text-white tracking-tighter">PROMPT <span class="text-emerald-500">ARSENAL</span></h1>
-                <p class="text-gray-500 text-sm">行业级深度改写 & 自定义指令集</p>
+                <h1 class="text-4xl font-black gradient-text tracking-tighter">PROMPT <span class="text-white">ARSENAL</span></h1>
+                <p id="ui-subtitle" class="text-gray-500 text-sm mt-1">行业级深度改写 & 自定义指令集</p>
             </div>
-            <button onclick="toggleSettings()" class="glass px-6 py-2 rounded-full mt-4 md:mt-0 hover:neon-border transition">
-                <i class="fa-solid fa-gear mr-2"></i>API & 导入配置
-            </button>
+            <div class="flex items-center gap-3">
+                <button onclick="toggleLang()" class="glass px-4 py-2 rounded-xl hover:bg-white/5 transition flex items-center gap-2 text-sm">
+                    <i class="fa-solid fa-earth-americas text-blue-400"></i>
+                    <span id="lang-btn-text">English</span>
+                </button>
+                <button onclick="toggleSettings()" class="glass px-4 py-2 rounded-xl hover:bg-white/5 transition flex items-center gap-2 text-sm text-emerald-400">
+                    <i class="fa-solid fa-key"></i> <span id="ui-api-btn">API Settings</span>
+                </button>
+            </div>
         </header>
 
-        <section id="settings" class="glass rounded-3xl p-6 mb-10 hidden">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <section id="settings" class="glass rounded-3xl p-8 mb-10 hidden animate-in fade-in slide-in-from-top-4 duration-300">
+            <h3 id="ui-config-title" class="text-xl font-bold mb-6">配置中心</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div class="space-y-2">
-                    <label class="text-xs font-bold text-gray-500">GEMINI KEY (EN)</label>
-                    <input id="gemini-key" type="password" class="w-full bg-black/50 border border-white/10 rounded-xl p-3 outline-none focus:border-emerald-500">
+                    <label class="text-xs font-bold text-gray-500 uppercase tracking-widest">Gemini API Key (Global)</label>
+                    <input id="gemini-key" type="password" class="w-full bg-black/40 border border-white/10 rounded-xl p-3 outline-none focus:border-emerald-500 transition" placeholder="Paste Gemini Key...">
                 </div>
                 <div class="space-y-2">
-                    <label class="text-xs font-bold text-gray-500">QWEN KEY (CN)</label>
-                    <input id="qwen-key" type="password" class="w-full bg-black/50 border border-white/10 rounded-xl p-3 outline-none focus:border-emerald-500">
+                    <label class="text-xs font-bold text-gray-500 uppercase tracking-widest">Qwen API Key (China)</label>
+                    <input id="qwen-key" type="password" class="w-full bg-black/40 border border-white/10 rounded-xl p-3 outline-none focus:border-emerald-500 transition" placeholder="Paste Qwen Key...">
                 </div>
             </div>
-            <div class="mt-6 border-t border-white/5 pt-6">
-                <label class="text-xs font-bold text-emerald-500">上传自定义提示词库 (JSON格式)</label>
-                <input type="file" id="import-prompt" class="block w-full text-sm text-gray-500 mt-2">
-            </div>
-            <button onclick="saveConfig()" class="w-full bg-emerald-600 text-black font-bold py-3 rounded-xl mt-6">保存所有配置</button>
+            <button id="ui-save-btn" onclick="saveConfig()" class="w-full bg-emerald-600 text-black font-black py-4 rounded-2xl mt-8 hover:bg-emerald-500 transition shadow-lg shadow-emerald-900/20">保存配置并生效</button>
         </section>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             
             <div class="lg:col-span-1 space-y-4">
-                <h3 class="text-sm font-bold text-gray-500 uppercase px-2">选择行业专家模型</h3>
+                <h3 id="ui-expert-title" class="text-xs font-black text-gray-500 uppercase tracking-widest px-2">选择专家模型</h3>
                 <div id="industry-list" class="grid grid-cols-1 gap-3">
                     </div>
             </div>
 
             <div class="lg:col-span-2 space-y-6">
-                <div class="glass rounded-3xl p-6">
-                    <div class="flex justify-between mb-4">
-                        <span id="current-mode" class="text-emerald-400 font-bold">当前模式: 均衡改写</span>
-                        <span class="text-xs text-gray-600" id="word-info">等待输入...</span>
+                <div class="glass rounded-[2rem] p-8 relative overflow-hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <span id="current-mode-display" class="bg-emerald-500/10 text-emerald-400 px-4 py-1 rounded-full text-sm font-bold border border-emerald-500/20">均衡改写模式</span>
+                        <button onclick="clearText()" class="text-gray-600 hover:text-white transition text-sm"><i class="fa-solid fa-trash-can"></i></button>
                     </div>
-                    <textarea id="input-text" class="w-full h-64 bg-transparent outline-none text-lg leading-relaxed" placeholder="在此输入需要处理的内容..."></textarea>
-                    <button onclick="execute()" class="w-full bg-gradient-to-r from-emerald-600 to-blue-600 py-4 rounded-2xl font-black text-xl hover:scale-[1.01] transition mt-4">
-                        执行专家级改写 <i class="fa-solid fa-bolt-lightning ml-2"></i>
+                    <textarea id="input-text" class="w-full h-80 bg-transparent outline-none text-xl leading-relaxed placeholder:text-gray-700" placeholder="Paste AI generated content here..."></textarea>
+                    
+                    <button id="ui-execute-btn" onclick="execute()" class="w-full bg-gradient-to-br from-emerald-500 to-blue-600 py-5 rounded-2xl font-black text-xl text-black hover:scale-[1.01] active:scale-[0.99] transition shadow-xl shadow-emerald-500/10 mt-4 flex items-center justify-center gap-3">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> <span>开始专家级重写</span>
                     </button>
                 </div>
 
-                <div id="output-container" class="glass rounded-3xl p-6 min-h-[300px] relative">
-                    <div id="loader" class="hidden absolute inset-0 bg-black/60 flex items-center justify-center rounded-3xl z-10">
-                        <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-emerald-500"></div>
+                <div id="output-container" class="glass rounded-[2rem] p-8 min-h-[400px] relative group border-dashed border-white/5">
+                    <div id="loader" class="hidden absolute inset-0 bg-black/80 flex flex-col items-center justify-center rounded-[2rem] z-20 backdrop-blur-sm">
+                        <div class="w-12 h-12 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin"></div>
+                        <p id="ui-loading-text" class="mt-4 text-xs font-bold tracking-widest text-emerald-500 animate-pulse">正在重构语言维度...</p>
                     </div>
-                    <div id="output-text" class="whitespace-pre-wrap leading-relaxed text-gray-200"></div>
+                    <div id="output-text" class="whitespace-pre-wrap leading-relaxed text-lg text-gray-200"></div>
+                    <button id="copy-btn" onclick="copyOutput()" class="hidden absolute top-6 right-6 glass p-3 rounded-xl hover:text-emerald-400 transition">
+                        <i class="fa-solid fa-copy"></i>
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // 1. 行业顶级提示词库 (这里写进你所有知道的精华)
-        const MASTER_PROMPTS = {
-            balanced: { name: "均衡改写", icon: "fa-scale-balanced", prompt: "作为语言专家，请改写以下内容，增加文本的突发性和困惑度，消除AI感，保留原意。" },
-            copywriter: { name: "小红书爆款", icon: "fa-hashtag", prompt: "你现在是小红书百万粉丝博主。请用极具感染力的语气改写内容，多用表情符号，增加互动感，打破AI的陈述感。" },
-            academic: { name: "学术论文降重", icon: "fa-graduation-cap", prompt: "你是一位资深学术编辑。请在保留专业术语的前提下，大幅度调整句式结构，使用更高级的近义词替换，确保过查重。" },
-            lawyer: { name: "法律合规润色", icon: "fa-gavel", prompt: "你是一位严谨的律师。请用专业、客观、不带感情色彩且逻辑严密的法律术语改写以下内容。" },
-            storyteller: { name: "文学故事化", icon: "fa-book-open", prompt: "你是一位小说家。请将这段平淡的叙述转化为极具画面感、充满隐喻和细节描写的文学片段。" },
-            coder: { name: "技术文档官", icon: "fa-code", prompt: "你是一位资深架构师。请将这段描述转化为简洁、精准、逻辑清晰的技术规格说明。" }
+        // 多语言配置
+        const I18N = {
+            zh: {
+                subtitle: "行业级深度改写 & 自定义指令集",
+                apiBtn: "API 配置",
+                saveBtn: "保存配置并生效",
+                expertTitle: "选择专家模型",
+                executeBtn: "开始专家级重写",
+                loadingText: "正在重构语言维度...",
+                configTitle: "配置中心",
+                modes: {
+                    balanced: { name: "均衡改写", prompt: "作为语言专家，请改写以下内容，增加文本的突发性和困惑度，消除AI感，保留原意。" },
+                    copywriter: { name: "小红书爆款", prompt: "你现在是小红书百万粉丝博主。请用极具感染力的语气改写内容，多用表情符号，增加互动感，打破AI的陈述感。" },
+                    academic: { name: "学术论文降重", prompt: "你是一位资深学术编辑。请在保留专业术语的前提下，大幅度调整句式结构，使用更高级的近义词替换，确保过查重。" },
+                    lawyer: { name: "法律专家", prompt: "你是一位资深律师。请用专业、客观、逻辑严密的法律术语改写以下内容。" },
+                    social: { name: "Twitter/X 推文", prompt: "你是一位社交媒体意见领袖。请将这段话改写成极具争议性或传播力的推文，简短有力。" }
+                }
+            },
+            en: {
+                subtitle: "Professional Rewriting & Custom Instruction Set",
+                apiBtn: "API Settings",
+                saveBtn: "Save & Deploy",
+                expertTitle: "Select Expert Model",
+                executeBtn: "Execute Magic Rewrite",
+                loadingText: "RECONSTRUCTING LINGUISTIC DIMENSIONS...",
+                configTitle: "CONFIGURATION",
+                modes: {
+                    balanced: { name: "Balanced Rewrite", prompt: "As a linguistic expert, rewrite this to increase Perplexity and Burstiness. Eliminate AI patterns while keeping original meaning." },
+                    copywriter: { name: "Viral Copywriter", prompt: "Act as a world-class copywriter. Rewrite this to be highly engaging, emotive, and persuasive. Use hooks that grab attention." },
+                    academic: { name: "Academic Paraphrase", prompt: "Act as a senior academic editor. Rewrite this for a top-tier journal. Use complex structures and high-level vocabulary to avoid plagiarism." },
+                    lawyer: { name: "Legal Counsel", prompt: "Act as a legal expert. Rewrite this content into formal, precise, and legally sound terminology." },
+                    social: { name: "X/Social Master", prompt: "Rewrite this into a viral tweet format. Punchy, controversial, and under 280 characters." }
+                }
+            }
         };
 
+        let currentLang = localStorage.getItem('app_lang') || 'zh';
         let selectedMode = 'balanced';
 
-        // 初始化行业列表
-        function initIndustries() {
+        function updateUI() {
+            const ui = I18N[currentLang];
+            document.getElementById('ui-subtitle').textContent = ui.subtitle;
+            document.getElementById('ui-api-btn').textContent = ui.apiBtn;
+            document.getElementById('ui-save-btn').textContent = ui.saveBtn;
+            document.getElementById('ui-expert-title').textContent = ui.expertTitle;
+            document.getElementById('ui-execute-btn').querySelector('span').textContent = ui.executeBtn;
+            document.getElementById('ui-loading-text').textContent = ui.loadingText;
+            document.getElementById('ui-config-title').textContent = ui.configTitle;
+            document.getElementById('lang-btn-text').textContent = currentLang === 'zh' ? 'English' : '中文 (ZH)';
+            
+            // Re-render industry list
+            renderIndustryList();
+            document.getElementById('current-mode-display').textContent = ui.modes[selectedMode].name;
+        }
+
+        function renderIndustryList() {
             const list = document.getElementById('industry-list');
-            Object.keys(MASTER_PROMPTS).forEach(key => {
-                const item = MASTER_PROMPTS[key];
+            list.innerHTML = '';
+            const modes = I18N[currentLang].modes;
+            const icons = { balanced: 'fa-scale-balanced', copywriter: 'fa-hashtag', academic: 'fa-graduation-cap', lawyer: 'fa-gavel', social: 'fa-twitter' };
+
+            Object.keys(modes).forEach(key => {
                 const div = document.createElement('div');
-                div.className = `industry-card glass p-4 rounded-2xl cursor-pointer transition flex items-center gap-4 ${key === selectedMode ? 'neon-border' : ''}`;
-                div.onclick = () => selectIndustry(key, div);
-                div.innerHTML = `<i class="fa-solid ${item.icon} text-emerald-500"></i><span class="font-bold">${item.name}</span>`;
+                div.className = `industry-card glass p-5 rounded-2xl cursor-pointer flex items-center gap-4 ${key === selectedMode ? 'neon-border border-emerald-500' : ''}`;
+                div.onclick = () => {
+                    selectedMode = key;
+                    updateUI();
+                };
+                div.innerHTML = `<i class="fa-solid ${icons[key]} ${key === selectedMode ? 'text-emerald-400' : 'text-gray-600'} text-xl"></i><span class="font-bold text-sm">${modes[key].name}</span>`;
                 list.appendChild(div);
             });
         }
 
-        function selectIndustry(key, el) {
-            selectedMode = key;
-            document.querySelectorAll('.industry-card').forEach(c => c.classList.remove('neon-border'));
-            el.classList.add('neon-border');
-            document.getElementById('current-mode').textContent = `当前模式: ${MASTER_PROMPTS[key].name}`;
+        function toggleLang() {
+            currentLang = currentLang === 'zh' ? 'en' : 'zh';
+            localStorage.setItem('app_lang', currentLang);
+            updateUI();
         }
 
         function toggleSettings() { document.getElementById('settings').classList.toggle('hidden'); }
@@ -111,7 +169,7 @@
         function saveConfig() {
             localStorage.setItem('gem_key', document.getElementById('gemini-key').value);
             localStorage.setItem('qw_key', document.getElementById('qwen-key').value);
-            alert('配置已锁定');
+            alert(currentLang === 'zh' ? '配置已保存' : 'Settings Saved');
             toggleSettings();
         }
 
@@ -124,7 +182,7 @@
             if(!key) return toggleSettings();
 
             document.getElementById('loader').classList.remove('hidden');
-            const systemPrompt = MASTER_PROMPTS[selectedMode].prompt;
+            const systemPrompt = I18N[currentLang].modes[selectedMode].prompt;
 
             try {
                 if(isCN) {
@@ -132,8 +190,9 @@
                 } else {
                     await callGemini(key, systemPrompt, text);
                 }
+                document.getElementById('copy-btn').classList.remove('hidden');
             } catch(e) {
-                document.getElementById('output-text').textContent = "错误: " + e.message;
+                document.getElementById('output-text').textContent = "Error: " + e.message;
             } finally {
                 document.getElementById('loader').classList.add('hidden');
             }
@@ -144,7 +203,7 @@
             const res = await fetch(url, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ contents: [{ parts: [{ text: sys + "\n\n" + text }] }] })
+                body: JSON.stringify({ contents: [{ parts: [{ text: sys + "\n\nInput:\n" + text }] }] })
             });
             const data = await res.json();
             document.getElementById('output-text').textContent = data.candidates[0].content.parts[0].text;
@@ -160,7 +219,19 @@
             document.getElementById('output-text').textContent = data.choices[0].message.content;
         }
 
-        initIndustries();
+        function copyOutput() {
+            navigator.clipboard.writeText(document.getElementById('output-text').textContent);
+            alert(currentLang === 'zh' ? '已复制到剪贴板' : 'Copied to clipboard');
+        }
+
+        function clearText() { document.getElementById('input-text').value = ''; }
+
+        // Initial Keys Setup
+        document.getElementById('gemini-key').value = localStorage.getItem('gem_key') || '';
+        document.getElementById('qwen-key').value = localStorage.getItem('qw_key') || '';
+        
+        // Start UI
+        updateUI();
     </script>
 </body>
 </html>
