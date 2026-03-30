@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>X-Trend AI 提示词助手</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .glass { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-500 to-purple-600 min-h-screen flex items-center justify-center p-4">
+    <div class="max-w-md w-full glass rounded-3xl shadow-2xl p-8 text-center">
+        <h1 class="text-3xl font-extrabold text-gray-800 mb-2">🚀 X-Trend AI</h1>
+        <p class="text-gray-600 mb-8">输入核心词，一键生成爆款推文提示词</p>
+        
+        <input id="keyword" type="text" placeholder="例如：人工智能, 赚钱, 健身" 
+               class="w-full p-4 rounded-xl border-2 border-purple-200 focus:border-purple-500 outline-none transition-all mb-4">
+        
+        <button onclick="generatePrompt()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 rounded-xl transition-all shadow-lg hover:shadow-purple-300">
+            生成提示词
+        </button>
+
+        <div id="result" class="mt-6 p-4 bg-purple-50 rounded-xl text-left hidden">
+            <p class="text-sm font-semibold text-purple-700 mb-2">复制到 ChatGPT/Claude 使用：</p>
+            <p id="promptText" class="text-gray-700 text-sm italic"></p>
+        </div>
+
+        <div class="mt-12 pt-6 border-t border-gray-100">
+            <p class="text-xs text-gray-400 mb-3">如果工具对你有帮助，欢迎打赏支持作者：</p>
+            <div class="flex flex-col gap-2">
+                <a href="https://www.paypal.me/Sunnyday168" target="_blank" class="text-sm text-blue-600 font-medium hover:underline">☕ 通过 PayPal 赞助</a>
+                <p class="text-[10px] text-gray-400 break-all">USDT(TRC20): TL4FQUjtgz7gy6UMEx5gZsZkK2Npmkq1YH</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function generatePrompt() {
+            const kw = document.getElementById('keyword').value || '副业';
+            const prompt = `请作为一名推文营销专家，围绕“${kw}”这个主题，为我撰写5条符合 X (Twitter) 算法的爆款推文。要求：1. 包含Hook钩子，2. 适当使用Emoji，3. 语气要犀利且有获得感，4. 每条不超过280字符。`;
+            document.getElementById('promptText').innerText = prompt;
+            document.getElementById('result').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
