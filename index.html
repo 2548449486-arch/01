@@ -2,46 +2,165 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>X-Trend AI 提示词助手</title>
+    <title>Prompt Arsenal Pro | 全行业AI提示词军火库</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        .glass { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); }
+        body { background: #08080a; color: #d1d5db; font-family: 'Inter', system-ui; }
+        .glass { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); backdrop-filter: blur(10px); }
+        .neon-border { border-color: #10b981; box-shadow: 0 0 15px rgba(16, 185, 129, 0.2); }
+        .industry-card:hover { border-color: #3b82f6; background: rgba(59, 130, 246, 0.05); }
     </style>
 </head>
-<body class="bg-gradient-to-br from-blue-500 to-purple-600 min-h-screen flex items-center justify-center p-4">
-    <div class="max-w-md w-full glass rounded-3xl shadow-2xl p-8 text-center">
-        <h1 class="text-3xl font-extrabold text-gray-800 mb-2">🚀 X-Trend AI</h1>
-        <p class="text-gray-600 mb-8">输入核心词，一键生成爆款推文提示词</p>
-        
-        <input id="keyword" type="text" placeholder="例如：人工智能, 赚钱, 健身" 
-               class="w-full p-4 rounded-xl border-2 border-purple-200 focus:border-purple-500 outline-none transition-all mb-4">
-        
-        <button onclick="generatePrompt()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 rounded-xl transition-all shadow-lg hover:shadow-purple-300">
-            生成提示词
-        </button>
+<body class="p-4 md:p-8">
 
-        <div id="result" class="mt-6 p-4 bg-purple-50 rounded-xl text-left hidden">
-            <p class="text-sm font-semibold text-purple-700 mb-2">复制到 ChatGPT/Claude 使用：</p>
-            <p id="promptText" class="text-gray-700 text-sm italic"></p>
-        </div>
+    <div class="max-w-7xl mx-auto">
+        <header class="flex flex-col md:flex-row justify-between items-center mb-10">
+            <div>
+                <h1 class="text-3xl font-black text-white tracking-tighter">PROMPT <span class="text-emerald-500">ARSENAL</span></h1>
+                <p class="text-gray-500 text-sm">行业级深度改写 & 自定义指令集</p>
+            </div>
+            <button onclick="toggleSettings()" class="glass px-6 py-2 rounded-full mt-4 md:mt-0 hover:neon-border transition">
+                <i class="fa-solid fa-gear mr-2"></i>API & 导入配置
+            </button>
+        </header>
 
-        <div class="mt-12 pt-6 border-t border-gray-100">
-            <p class="text-xs text-gray-400 mb-3">如果工具对你有帮助，欢迎打赏支持作者：</p>
-            <div class="flex flex-col gap-2">
-                <a href="https://www.paypal.me/Sunnyday168" target="_blank" class="text-sm text-blue-600 font-medium hover:underline">☕ 通过 PayPal 赞助</a>
-                <p class="text-[10px] text-gray-400 break-all">USDT(TRC20): TL4FQUjtgz7gy6UMEx5gZsZkK2Npmkq1YH</p>
+        <section id="settings" class="glass rounded-3xl p-6 mb-10 hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <label class="text-xs font-bold text-gray-500">GEMINI KEY (EN)</label>
+                    <input id="gemini-key" type="password" class="w-full bg-black/50 border border-white/10 rounded-xl p-3 outline-none focus:border-emerald-500">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-xs font-bold text-gray-500">QWEN KEY (CN)</label>
+                    <input id="qwen-key" type="password" class="w-full bg-black/50 border border-white/10 rounded-xl p-3 outline-none focus:border-emerald-500">
+                </div>
+            </div>
+            <div class="mt-6 border-t border-white/5 pt-6">
+                <label class="text-xs font-bold text-emerald-500">上传自定义提示词库 (JSON格式)</label>
+                <input type="file" id="import-prompt" class="block w-full text-sm text-gray-500 mt-2">
+            </div>
+            <button onclick="saveConfig()" class="w-full bg-emerald-600 text-black font-bold py-3 rounded-xl mt-6">保存所有配置</button>
+        </section>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <div class="lg:col-span-1 space-y-4">
+                <h3 class="text-sm font-bold text-gray-500 uppercase px-2">选择行业专家模型</h3>
+                <div id="industry-list" class="grid grid-cols-1 gap-3">
+                    </div>
+            </div>
+
+            <div class="lg:col-span-2 space-y-6">
+                <div class="glass rounded-3xl p-6">
+                    <div class="flex justify-between mb-4">
+                        <span id="current-mode" class="text-emerald-400 font-bold">当前模式: 均衡改写</span>
+                        <span class="text-xs text-gray-600" id="word-info">等待输入...</span>
+                    </div>
+                    <textarea id="input-text" class="w-full h-64 bg-transparent outline-none text-lg leading-relaxed" placeholder="在此输入需要处理的内容..."></textarea>
+                    <button onclick="execute()" class="w-full bg-gradient-to-r from-emerald-600 to-blue-600 py-4 rounded-2xl font-black text-xl hover:scale-[1.01] transition mt-4">
+                        执行专家级改写 <i class="fa-solid fa-bolt-lightning ml-2"></i>
+                    </button>
+                </div>
+
+                <div id="output-container" class="glass rounded-3xl p-6 min-h-[300px] relative">
+                    <div id="loader" class="hidden absolute inset-0 bg-black/60 flex items-center justify-center rounded-3xl z-10">
+                        <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-emerald-500"></div>
+                    </div>
+                    <div id="output-text" class="whitespace-pre-wrap leading-relaxed text-gray-200"></div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        function generatePrompt() {
-            const kw = document.getElementById('keyword').value || '副业';
-            const prompt = `请作为一名推文营销专家，围绕“${kw}”这个主题，为我撰写5条符合 X (Twitter) 算法的爆款推文。要求：1. 包含Hook钩子，2. 适当使用Emoji，3. 语气要犀利且有获得感，4. 每条不超过280字符。`;
-            document.getElementById('promptText').innerText = prompt;
-            document.getElementById('result').classList.remove('hidden');
+        // 1. 行业顶级提示词库 (这里写进你所有知道的精华)
+        const MASTER_PROMPTS = {
+            balanced: { name: "均衡改写", icon: "fa-scale-balanced", prompt: "作为语言专家，请改写以下内容，增加文本的突发性和困惑度，消除AI感，保留原意。" },
+            copywriter: { name: "小红书爆款", icon: "fa-hashtag", prompt: "你现在是小红书百万粉丝博主。请用极具感染力的语气改写内容，多用表情符号，增加互动感，打破AI的陈述感。" },
+            academic: { name: "学术论文降重", icon: "fa-graduation-cap", prompt: "你是一位资深学术编辑。请在保留专业术语的前提下，大幅度调整句式结构，使用更高级的近义词替换，确保过查重。" },
+            lawyer: { name: "法律合规润色", icon: "fa-gavel", prompt: "你是一位严谨的律师。请用专业、客观、不带感情色彩且逻辑严密的法律术语改写以下内容。" },
+            storyteller: { name: "文学故事化", icon: "fa-book-open", prompt: "你是一位小说家。请将这段平淡的叙述转化为极具画面感、充满隐喻和细节描写的文学片段。" },
+            coder: { name: "技术文档官", icon: "fa-code", prompt: "你是一位资深架构师。请将这段描述转化为简洁、精准、逻辑清晰的技术规格说明。" }
+        };
+
+        let selectedMode = 'balanced';
+
+        // 初始化行业列表
+        function initIndustries() {
+            const list = document.getElementById('industry-list');
+            Object.keys(MASTER_PROMPTS).forEach(key => {
+                const item = MASTER_PROMPTS[key];
+                const div = document.createElement('div');
+                div.className = `industry-card glass p-4 rounded-2xl cursor-pointer transition flex items-center gap-4 ${key === selectedMode ? 'neon-border' : ''}`;
+                div.onclick = () => selectIndustry(key, div);
+                div.innerHTML = `<i class="fa-solid ${item.icon} text-emerald-500"></i><span class="font-bold">${item.name}</span>`;
+                list.appendChild(div);
+            });
         }
+
+        function selectIndustry(key, el) {
+            selectedMode = key;
+            document.querySelectorAll('.industry-card').forEach(c => c.classList.remove('neon-border'));
+            el.classList.add('neon-border');
+            document.getElementById('current-mode').textContent = `当前模式: ${MASTER_PROMPTS[key].name}`;
+        }
+
+        function toggleSettings() { document.getElementById('settings').classList.toggle('hidden'); }
+        
+        function saveConfig() {
+            localStorage.setItem('gem_key', document.getElementById('gemini-key').value);
+            localStorage.setItem('qw_key', document.getElementById('qwen-key').value);
+            alert('配置已锁定');
+            toggleSettings();
+        }
+
+        async function execute() {
+            const text = document.getElementById('input-text').value.trim();
+            if(!text) return;
+
+            const isCN = /[\u4e00-\u9fa5]/.test(text);
+            const key = isCN ? localStorage.getItem('qw_key') : localStorage.getItem('gem_key');
+            if(!key) return toggleSettings();
+
+            document.getElementById('loader').classList.remove('hidden');
+            const systemPrompt = MASTER_PROMPTS[selectedMode].prompt;
+
+            try {
+                if(isCN) {
+                    await callQwen(key, systemPrompt, text);
+                } else {
+                    await callGemini(key, systemPrompt, text);
+                }
+            } catch(e) {
+                document.getElementById('output-text').textContent = "错误: " + e.message;
+            } finally {
+                document.getElementById('loader').classList.add('hidden');
+            }
+        }
+
+        async function callGemini(key, sys, text) {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ contents: [{ parts: [{ text: sys + "\n\n" + text }] }] })
+            });
+            const data = await res.json();
+            document.getElementById('output-text').textContent = data.candidates[0].content.parts[0].text;
+        }
+
+        async function callQwen(key, sys, text) {
+            const res = await fetch('https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${key}`},
+                body: JSON.stringify({ model: "qwen-max", messages: [{role: "system", content: sys}, {role: "user", content: text}] })
+            });
+            const data = await res.json();
+            document.getElementById('output-text').textContent = data.choices[0].message.content;
+        }
+
+        initIndustries();
     </script>
 </body>
 </html>
